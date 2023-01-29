@@ -2,13 +2,40 @@
   "name": "be-transrendered",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "keywords": [
+    "web-components",
+    "web-component",
+    "custom-element",
+    "custom-elements"
+  ],
+  "main": "be-transrendered.js",
+  "module": "be-transrendered.js",
+  "files": [
+    "*.*"
+  ],
+  "exports": {
+    ".": "./be-transrendered.js",
+    "./be-transrendered.js": "./be-transrendered.js"
+  },
+  "types": "types.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "node node_modules/may-it-serve/serve.js",
+    "test": "playwright test",
+    "package-check": "package-check"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bahrus/be-transrendered.git"
+  },
+  "dependencies": {
+    "be-decorated": "0.0.222",
+    "be-hive": "0.0.82",
+    "trans-render": "0.0.664"
+  },
+  "devDependencies": {
+    "may-it-serve": "0.0.4",
+    "@playwright/test": "1.30.0",
+    "@skypack/package-check": "0.2.2"
   },
   "author": "",
   "license": "MIT",
