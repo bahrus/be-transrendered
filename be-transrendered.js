@@ -3,7 +3,7 @@ import { register } from "be-hive/register.js";
 export class BeTransrendered extends EventTarget {
     async instantiate(pp, mold) {
         //TODO lots of common code with be-free-ranged.  maybe move some to be-transformed package.
-        const { host, transformIslets, self, template } = pp;
+        const { transformIslets, self, template } = pp;
         const { DTR } = await import('trans-render/lib/DTR.js');
         const { getDestructArgs } = await import('trans-render/lib/getDestructArgs.js');
         let clone;
@@ -13,9 +13,28 @@ export class BeTransrendered extends EventTarget {
         const { IsletTransformer } = await import('./IsletTransformer.js');
         for (const transformIslet of transformIslets) {
             const { transform, islet } = transformIslet;
-            let { isletDependencies } = transformIslet;
+            let { isletDependencies, scopesUp } = transformIslet;
             if (isletDependencies === undefined) {
                 isletDependencies = transformIslet.isletDependencies = getDestructArgs(islet);
+            }
+            let host = undefined;
+            if (scopesUp === undefined)
+                scopesUp = 0;
+            if (scopesUp === -1) {
+                host = self.getRootNode().host; //TODO await customElements.whenDefined;
+            }
+            else {
+                let count = 0;
+                let el = self;
+                while (count <= scopesUp) {
+                    el = el.closest('[itemscope]');
+                    if (el === null) {
+                        host = self.getRootNode().host; //TODO await customElements.whenDefined;
+                        break;
+                    }
+                    count++;
+                }
+                host = el;
             }
             const ctx = {
                 host,
@@ -52,11 +71,11 @@ define({
         propDefaults: {
             ifWantsToBe,
             upgrade,
-            virtualProps: ['transformIslets', 'host', 'template']
+            virtualProps: ['transformIslets', 'template']
         },
         actions: {
             instantiate: {
-                ifAllOf: ['transformIslets', 'host', 'template'],
+                ifAllOf: ['transformIslets', 'template'],
                 returnObjMold: {
                     resolved: true,
                 }

@@ -3,7 +3,7 @@ import {TransformIslet} from 'trans-render/lib/types';
 
 export interface EndUserProps{
     transformIslets?: TransformIslet[];
-    host?: EventTarget;
+    //host?: EventTarget;
     template?: HTMLTemplateElement;
 }
 
