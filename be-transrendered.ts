@@ -17,9 +17,9 @@ export class BeTransrendered extends EventTarget implements Actions{
         }
         const {IsletTransformer} = await import('./IsletTransformer.js');
         for(const transformIslet of transformIslets!){
-            const {transform, islet} = transformIslet;
+            const {transform, islet, hydratingTransform} = transformIslet;
             let {isletDependencies, scopesUp} = transformIslet;
-            if(isletDependencies === undefined){
+            if(isletDependencies === undefined && islet !== undefined){
                 isletDependencies = transformIslet.isletDependencies = getDestructArgs(islet);
             }
             let host: any = undefined;
@@ -34,10 +34,20 @@ export class BeTransrendered extends EventTarget implements Actions{
                     if(el === null){
                         host = (<any>self.getRootNode()).host; //TODO await customElements.whenDefined;
                         break;
+                    }else{
+                        host = (<any>el).beDecorated?.scoped?.scope;
                     }
                     count++;
                 }
-                host = el;
+            }
+            if(hydratingTransform !== undefined){
+                const hydratingCtx: RenderContext = {
+                    host,
+                    match: hydratingTransform
+                };
+                const dtr = new DTR(hydratingCtx);
+                const fragment = clone || self;
+                dtr.transform(fragment);
             }
             const ctx: RenderContext = {
                 host,
