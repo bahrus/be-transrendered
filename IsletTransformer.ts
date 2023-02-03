@@ -9,12 +9,14 @@ export class IsletTransformer{
         ){
         const {islet, transform, isletDependencies, transformDependencies} = transformIslet;
         const self = this;
-        host.addEventListener('prop-changed', e => {
+        host.addEventListener('prop-changed', async e => {
             const changeInfo = (e as CustomEvent).detail as ProxyPropChangeInfo;
             const {prop, newVal, oldValue} = changeInfo;
             if(newVal === oldValue) return;
             if(isletDependencies!.includes(prop)){
-                Object.assign(host, islet(host));
+                const {ScopeNavigator} = await import('trans-render/lib/ScopeNavigator.js');
+                const sn = new ScopeNavigator(this.target);
+                Object.assign(host, islet(host, sn));
             }
             if(transformDependencies!.has(prop)){
                 self.#transformNeeded = true;

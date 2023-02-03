@@ -62,7 +62,9 @@ export class BeTransrendered extends EventTarget implements Actions{
             }
 
             if(islet !== undefined){
-                Object.assign(host!, islet(host));
+                const {ScopeNavigator} = await import('trans-render/lib/ScopeNavigator.js');
+                const sn = new ScopeNavigator(self);
+                Object.assign(host!, islet(host, sn));
             }
             if(clone !== undefined){
                 await transformer.transform(clone);
