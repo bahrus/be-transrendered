@@ -22,41 +22,17 @@ export class BeTransrendered extends EventTarget implements Actions{
             clone = template!.content.cloneNode(true) as DocumentFragment;
         }
         const {IsletTransformer} = await import('./IsletTransformer.js');
+
+        const {ScopeNavigator} = await import('trans-render/lib/ScopeNavigator.js');
+        const sn = new ScopeNavigator(self);
         for(const transformIslet of transformIslets!){
             const {transform, islet, hydratingTransform} = transformIslet;
-            let {isletDependencies, scopesUp} = transformIslet;
+            let {isletDependencies, scopeNav} = transformIslet;
             if(isletDependencies === undefined && islet !== undefined){
                 isletDependencies = transformIslet.isletDependencies = getDestructArgs(islet);
             }
-            let host: any = undefined;
-            if(scopesUp === undefined) scopesUp = 0;
-            if(scopesUp === -1){
-                const rn = (<any>self).getRootNode();
-                host = rn.host; //TODO await customElements.whenDefined;
-                if(!host){
-                    console.log({host, rn});
-                }
-            }else{
-                let count = 0;
-                let el = self as Element | null;
-                while(count <= scopesUp){
-                    el = el!.closest('[itemscope]');
-                    if(el === null){
-                        const rn = (<any>self).getRootNode();
-                        host = rn.host; //TODO await customElements.whenDefined;
-                        if(!host){
-                            console.log({host, rn});
-                        }
-                        break;
-                    }else{
-                        host = (<any>el).beDecorated?.scoped?.scope;
-                        if(!host){
-                            console.log({host});
-                        }
-                    }
-                    count++;
-                }
-            }
+            if(scopeNav === undefined) scopeNav = 'scope';
+            const host =  await sn.nav(scopeNav);          
             if(hydratingTransform !== undefined){
                 const hydratingCtx: RenderContext = {
                     host,
@@ -79,8 +55,8 @@ export class BeTransrendered extends EventTarget implements Actions{
             }
 
             if(islet !== undefined){
-                const {ScopeNavigator} = await import('trans-render/lib/ScopeNavigator.js');
-                const sn = new ScopeNavigator(self);
+                
+                
                 Object.assign(host!, islet(host, sn));
             }
             if(clone !== undefined){
