@@ -1,6 +1,12 @@
 import { define } from 'be-decorated/DE.js';
 import { register } from "be-hive/register.js";
 export class BeTransrendered extends EventTarget {
+    // getHost(self: Element): Promise<Element>{
+    //     return new Promise((resolve) => {
+    //         const rn = self.getRootNode();
+    //         if()
+    //     })
+    // }
     async instantiate(pp, mold) {
         //TODO lots of common code with be-free-ranged.  maybe move some to be-transformed package.
         const { transformIslets, self, template } = pp;
@@ -21,7 +27,11 @@ export class BeTransrendered extends EventTarget {
             if (scopesUp === undefined)
                 scopesUp = 0;
             if (scopesUp === -1) {
-                host = self.getRootNode().host; //TODO await customElements.whenDefined;
+                const rn = self.getRootNode();
+                host = rn.host; //TODO await customElements.whenDefined;
+                if (!host) {
+                    console.log({ host, rn });
+                }
             }
             else {
                 let count = 0;
@@ -29,11 +39,18 @@ export class BeTransrendered extends EventTarget {
                 while (count <= scopesUp) {
                     el = el.closest('[itemscope]');
                     if (el === null) {
-                        host = self.getRootNode().host; //TODO await customElements.whenDefined;
+                        const rn = self.getRootNode();
+                        host = rn.host; //TODO await customElements.whenDefined;
+                        if (!host) {
+                            console.log({ host, rn });
+                        }
                         break;
                     }
                     else {
                         host = el.beDecorated?.scoped?.scope;
+                        if (!host) {
+                            console.log({ host });
+                        }
                     }
                     count++;
                 }

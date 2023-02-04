@@ -5,6 +5,12 @@ import {register} from "be-hive/register.js";
 
 export class BeTransrendered extends EventTarget implements Actions{
 
+    // getHost(self: Element): Promise<Element>{
+    //     return new Promise((resolve) => {
+    //         const rn = self.getRootNode();
+    //         if()
+    //     })
+    // }
 
     async instantiate(pp: PP, mold: Partial<PP>): PPPP {
         //TODO lots of common code with be-free-ranged.  maybe move some to be-transformed package.
@@ -25,17 +31,28 @@ export class BeTransrendered extends EventTarget implements Actions{
             let host: any = undefined;
             if(scopesUp === undefined) scopesUp = 0;
             if(scopesUp === -1){
-                host = (<any>self.getRootNode()).host; //TODO await customElements.whenDefined;
+                const rn = (<any>self).getRootNode();
+                host = rn.host; //TODO await customElements.whenDefined;
+                if(!host){
+                    console.log({host, rn});
+                }
             }else{
                 let count = 0;
                 let el = self as Element | null;
                 while(count <= scopesUp){
                     el = el!.closest('[itemscope]');
                     if(el === null){
-                        host = (<any>self.getRootNode()).host; //TODO await customElements.whenDefined;
+                        const rn = (<any>self).getRootNode();
+                        host = rn.host; //TODO await customElements.whenDefined;
+                        if(!host){
+                            console.log({host, rn});
+                        }
                         break;
                     }else{
                         host = (<any>el).beDecorated?.scoped?.scope;
+                        if(!host){
+                            console.log({host});
+                        }
                     }
                     count++;
                 }
