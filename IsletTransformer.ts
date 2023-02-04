@@ -1,5 +1,4 @@
 import {TransformIslet, ProxyPropChangeInfo} from '../trans-render/lib/types';
-import {getAdjacentChildren} from 'trans-render/lib/getAdjacentChildren.js';
 export class IsletTransformer{
     #transformNeeded = false;
     constructor(
@@ -7,24 +6,31 @@ export class IsletTransformer{
         public transformIslet: TransformIslet,
         host: EventTarget
         ){
-        const {islet, transform, isletDependencies, transformDependencies} = transformIslet;
+        this.init(host);
+    }
+    
+    async init(host: EventTarget){
+        const {islet, transform, isletDependencies, transformDependencies} = this.transformIslet;
         const self = this;
-        host.addEventListener('prop-changed', async e => {
+        const {getPropagator} = await import('trans-render/lib/getPropagator.js');
+        const eventTarget = await getPropagator(host);
+        eventTarget.addEventListener('prop-changed', async e => {
             const changeInfo = (e as CustomEvent).detail as ProxyPropChangeInfo;
-            const {prop, newVal, oldValue} = changeInfo;
-            if(newVal === oldValue) return;
-            if(isletDependencies!.includes(prop)){
+            const {prop, newVal, oldVal} = changeInfo;
+            if(newVal === oldVal) return;
+            if(isletDependencies?.includes(prop)){
                 const {ScopeNavigator} = await import('trans-render/lib/ScopeNavigator.js');
                 const sn = new ScopeNavigator(this.target);
-                Object.assign(host, islet(host, sn));
+                Object.assign(host, islet(eventTarget, sn));
             }
-            if(transformDependencies!.has(prop)){
+            if(transformDependencies?.has(prop)){
                 self.#transformNeeded = true;
                 (async () => {
                     await self.doTransform();
                 })();
             }
         });
+
     }
 
     async doTransform(){

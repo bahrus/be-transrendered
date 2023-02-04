@@ -25,8 +25,13 @@ export class BeTransrendered extends EventTarget {
             if (isletDependencies === undefined && islet !== undefined) {
                 isletDependencies = transformIslet.isletDependencies = getDestructArgs(islet);
             }
-            if (scopeNav === undefined)
+            if (scopeNav === undefined) {
                 scopeNav = 'scope';
+            }
+            else {
+                if (scopeNav.indexOf('.') !== -1)
+                    scopeNav = '.' + scopeNav;
+            }
             const host = await sn.nav(scopeNav);
             if (hydratingTransform !== undefined) {
                 const hydratingCtx = {
