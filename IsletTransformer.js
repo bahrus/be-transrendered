@@ -8,13 +8,17 @@ export class IsletTransformer {
         this.init(host);
     }
     async init(host) {
-        const { islet, transform, isletDependencies, transformDependencies } = this.transformIslet;
+        const { islet, transform, isletDependencies, transformDependencies, debug } = this.transformIslet;
+        if (debug)
+            debugger;
         const self = this;
         const { getPropagator } = await import('trans-render/lib/getPropagator.js');
         const eventTarget = await getPropagator(host);
         eventTarget.addEventListener('prop-changed', async (e) => {
             const changeInfo = e.detail;
             const { prop, newVal, oldVal } = changeInfo;
+            if (debug)
+                debugger;
             if (newVal === oldVal)
                 return;
             if (isletDependencies?.includes(prop)) {
